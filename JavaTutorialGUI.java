@@ -13,15 +13,13 @@ package codhisattva;
 
 
 import java.awt.*;
-
-import java.awt.event.MouseEvent;
-
-import java.awt.event.MouseListener;
-import java.util.LinkedList;
+import java.awt.event.*;
+import java.util.*;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.*;
+
+
 
 
 
@@ -50,6 +48,8 @@ public class JavaTutorialGUI extends JFrame{
     JPanel mainPanel, headerPanel, navPanel, titlePanel;
 
     JLabel instructionLink, assessmentLink;
+    
+    JButton navButton;
 
     Color baseBlue = new Color(0,51,102);
 
@@ -59,18 +59,18 @@ public class JavaTutorialGUI extends JFrame{
 
     String[] tutorialListArray = {"tutorial 1","tutorial 2","tutorial 3"};
 
-    String[] assessmentListArray = {"Error ID", "Code Tracing", "Multiple Choice"};
+    String[] assessmentListArray = {"Assessment Home","Error ID", "Code Tracing", "Multiple Choice"};
 
     HomePanelMouseListener instructionLinkListener, assessmentLinkListener;
 
     public panelType panelSelect;
-    
+    navSelectionType navSelect = navSelectionType.nill;
     HeaderPanelMouseListener homeListener, navListener, nextListener, 
             previousListener, doneListener;
 
     
 
-    boolean navBool = false;
+    boolean navBool;
 
     enum panelType {
 
@@ -82,6 +82,13 @@ public class JavaTutorialGUI extends JFrame{
 
     }
 
+    enum navSelectionType{
+        assessmentHome,
+        multipleChoice,
+        errorID,
+        codeTracing,
+        nill
+    }
     public static void main(String[] args) {
 
         new JavaTutorialGUI();
@@ -295,8 +302,8 @@ public class JavaTutorialGUI extends JFrame{
         createNavPanel();
 
         mainPanel = new JPanel();
-
-        navBool = true;
+        
+        navBool = false;
 
         panelSelect = panelType.homePanel;
 
@@ -318,10 +325,11 @@ public class JavaTutorialGUI extends JFrame{
 
     JPanel createNavPanel(){
 
-
+        navButton = new JButton("Enter");
+        
         navPanel = new JPanel();
 
-        navPanel.setLayout(new GridLayout(1,1));
+        navPanel.setLayout(new BorderLayout());
 
         
 
@@ -332,20 +340,67 @@ public class JavaTutorialGUI extends JFrame{
         
         JList assessmentList = new JList(assessmentListArray);
         JScrollPane assessmentScrollPane = new JScrollPane(assessmentList);
+        
+        assessmentList.addListSelectionListener(
+                new ListSelectionListener(){
+                    @Override
+                    public void valueChanged(ListSelectionEvent event) {
+                        if(assessmentList.getSelectedIndex() == 0){
+                            navSelect = navSelectionType.assessmentHome;
+                        }
+                        else if(assessmentList.getSelectedIndex() == 1){
+                            navSelect = navSelectionType.errorID;
+                        }
+                        else if(assessmentList.getSelectedIndex() == 2){
+                            navSelect = navSelectionType.codeTracing;
+                        }
+                        else if(assessmentList.getSelectedIndex() == 3){
+                            navSelect = navSelectionType.multipleChoice;
+                        }
+                    }
+                    
+                }
+        );
 
         navTabbedPane = new JTabbedPane();
 
-        
-
+        navButton.addActionListener(
+                new ActionListener(){
+                    @Override
+                    public void actionPerformed(ActionEvent ae) {
+                        if(navSelect.equals(navSelectionType.assessmentHome)){
+                            assessmentPanel.createHomePanel();
+                            panelSelect = panelType.assessmentPanel;
+                            createMainPanel();
+                        }
+                        else if(navSelect.equals(navSelectionType.codeTracing)){
+                            assessmentPanel.createCodeTracingPanel();
+                            panelSelect = panelType.assessmentPanel;
+                            createMainPanel();
+                        }
+                        else if(navSelect.equals(navSelectionType.errorID)){
+                            assessmentPanel.createErrorIDPanel();
+                            panelSelect = panelType.assessmentPanel;
+                            createMainPanel();
+                        }
+                        else if(navSelect.equals(navSelectionType.multipleChoice)){
+                            assessmentPanel.createMultipleChoicePanel();
+                            panelSelect = panelType.assessmentPanel;
+                            createMainPanel();
+                        }
+                    }
+                    
+                }
+        );
         navTabbedPane.addTab("Tutorials",tutorialScrollPane);
 
         navTabbedPane.addTab("Assessments",assessmentScrollPane);
 
         
 
-        navPanel.add(navTabbedPane);
+        navPanel.add(navTabbedPane,BorderLayout.CENTER);
 
-        
+        navPanel.add(navButton,BorderLayout.SOUTH);
 
         
 
@@ -510,7 +565,7 @@ public class JavaTutorialGUI extends JFrame{
             }else if(_ot.getName().equals("assessmentLink")){
 
                 panelSelect = panelType.assessmentPanel;
-
+                assessmentPanel.createHomePanel();
                 createMainPanel();
 
             }
@@ -592,9 +647,7 @@ public class JavaTutorialGUI extends JFrame{
 
             }else if (_ot.getName().equals("next")){
                 
-                if(panelSelect.equals(panelType.instructionPanel)){       
-                    
-                    System.out.print("hello");
+                if(panelSelect.equals(panelType.instructionPanel)){                          
                     
                     instructionPanel.next();
                     
