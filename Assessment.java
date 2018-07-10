@@ -1,17 +1,8 @@
-/*
-
- * To change this license header, choose License Headers in Project Properties.
-
- * To change this template file, choose Tools | Templates
-
- * and open the template in the editor.
-
- */
-
 package codhisattva;
 
-import java.awt.Color;
-import java.awt.GridLayout;
+
+import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 
 
@@ -41,7 +32,7 @@ import javax.swing.*;
 
  * test the various method calls against fake data
 
- * 10 July 2018 Luke Markwordt added GUI components
+ * 10 July 2018 Luke Markwordt Added GUI Components
 
  */
 
@@ -68,12 +59,44 @@ public class Assessment extends JPanel{
     Color baseBlue = new Color(0,51,102);
     
     //private MultipleChoiceQuestion[] multipleChoiceQuestions;
+    
+    //links for AssessmentHomePanel
+    
+    JLabel codeTracingLink, errorIDLink, multipleChoiceLink;
+    
+    /*enum assessmentType {
+        nill,
+        home,
+        multipleChoice,
+        errorID,
+        codeTracing
+    }
 
+    assessmentType assessmentSelect = assessmentType.nill;*/
+    
     public Assessment(){
-          
-        this.add(createMultipleChoicePanel());
+         //initializing Links
+         
+         codeTracingLink = new JLabel("Code Tracing Questions",SwingConstants.CENTER);
+         errorIDLink = new JLabel("Error Identification Questions",SwingConstants.CENTER);
+         multipleChoiceLink = new JLabel("Multiple Choice Questions",SwingConstants.CENTER);
+         
+         codeTracingLink.setForeground(Color.WHITE);
+         errorIDLink.setForeground(Color.WHITE);
+         multipleChoiceLink.setForeground(Color.WHITE);
+         
+         codeTracingLink.addMouseListener(new LinkListener(codeTracingLink));
+         errorIDLink.addMouseListener(new LinkListener(errorIDLink));
+         multipleChoiceLink.addMouseListener(new LinkListener(multipleChoiceLink));
+         
+         codeTracingLink.setName("codeTracingLink");
+         errorIDLink.setName("errorIDLink");
+         multipleChoiceLink.setName("multipleChoiceLink");
+         
+         //setting layout
         this.setLayout(new GridLayout(1,1)); 
         
+        createHomePanel();
     }
     
 
@@ -167,27 +190,81 @@ public class Assessment extends JPanel{
 
     }
 
-    public JPanel createCodeTracingPanel(){
+    public void createHomePanel(){
+        //creating masterPanel
+        JPanel masterPanel = new JPanel();
+        masterPanel.setBackground(baseBlue);
+        masterPanel.setLayout(new GridLayout(2,1));
+        JLabel title = new JLabel("Assessment Modules", SwingConstants.CENTER);
+        title.setForeground(Color.WHITE);
+        title.setFont(new Font("Arial",Font.BOLD,30));
+        masterPanel.add(title);
+        //creating LinkPanel
+        JPanel linkPanel = new JPanel();
+        linkPanel.setBackground(baseBlue);
+        linkPanel.setLayout(new GridLayout(3,1));
+        linkPanel.add(multipleChoiceLink);
+        linkPanel.add(errorIDLink);
+        linkPanel.add(codeTracingLink);
         
-    String[] arr= {
-        "Hello", "you", "are", "special"
-    };
+        masterPanel.add(linkPanel);
         
-        return new CodeTracingQuestion("question 1234", 1,4,arr);
+        try{
+            this.removeAll();
+        }catch(Exception e){
+            
+        }
+        
+        this.add(masterPanel);
+        
+        this.revalidate();
+        this.validate();
+        this.repaint();
+             
+    }
+    public void createCodeTracingPanel(){
+        
+        String[] arr= {
+            "Hello", "you", "are", "special"
+        };
+        
+        try{
+            this.removeAll();
+        }catch(Exception e){
+            
+        }
+        
+        this.add(new CodeTracingQuestion("question 1234", 1,4,arr));
+        
+        this.revalidate();
+        this.validate();
+        this.repaint();
+        
         
     }
     
-    public JPanel createMultipleChoicePanel(){
+    public void  createMultipleChoicePanel(){
         
         String question = "what is the meaning of life";
         String[] choices = {"Choice A","Choice B","Choice C", "Choice D"};
         int answer = 1;
         String[] feedback = {"That","Was","A","Good","Choice"};
         
-        return new MultipleChoiceQuestion(question,choices,answer,feedback);
+        
+        try{
+            this.removeAll();
+        }catch(Exception e){
+            
+        }
+        
+        this.add(new MultipleChoiceQuestion(question,choices,answer,feedback));
+        
+        this.revalidate();
+        this.validate();
+        this.repaint();
         
     }
-    public ErrorIDQuestion createErrorIDPanel(){
+    public void createErrorIDPanel(){
         
         String[] arr= {
         "Hello", "you", "are", "special"      
@@ -201,7 +278,58 @@ public class Assessment extends JPanel{
           "this","is","feedback"  
         };
         
-        return new ErrorIDQuestion(arr,in,4, feed);
+        
+        try{
+            this.removeAll();
+        }catch(Exception e){
+            
+        }
+        
+        this.add(new ErrorIDQuestion(arr,in,4, feed));
+        
+        this.revalidate();
+        this.validate();
+        this.repaint();
     }
+    
+    class LinkListener implements MouseListener{
 
+        JLabel _label;
+        
+        LinkListener(JLabel label){
+            _label = label;
+        }
+        @Override
+        public void mouseClicked(MouseEvent me) {
+            if(_label.getName().equals("multipleChoiceLink")){
+                createMultipleChoicePanel();
+            }
+            else if(_label.getName().equals("errorIDLink")){
+                createErrorIDPanel();
+            }
+            else if(_label.getName().equals("codeTracingLink")){
+                createCodeTracingPanel();
+            }
+            _label.setForeground(Color.WHITE);
+        }
+
+        @Override
+        public void mousePressed(MouseEvent me) {
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent me) {
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent me) {
+            _label.setForeground(Color.YELLOW);
+        }
+
+        @Override
+        public void mouseExited(MouseEvent me) {
+            _label.setForeground(Color.WHITE);
+        }
+        
+    }
 }
